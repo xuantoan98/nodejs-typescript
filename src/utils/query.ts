@@ -1,5 +1,5 @@
 import { envConfig } from '../config/envConfig'
-import mysql from 'mysql2'
+import mysql, { Connection } from 'mysql'
 
 export const query = async (sql: string, params?: any) => {
   const config = {
@@ -10,9 +10,9 @@ export const query = async (sql: string, params?: any) => {
     connectTimeout: envConfig.connectTimeout
   } as mysql.ConnectionOptions
 
-  const connection = mysql.createConnection(config)
+  const connection: Connection = mysql.createConnection(config)
 
-  const results = connection.execute(sql, params)
+  const results = connection.query(sql, params)
 
   return results
 }

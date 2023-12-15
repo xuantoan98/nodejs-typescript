@@ -1,13 +1,14 @@
-import express, { Request, Response } from 'express'
+import { Request, Response } from 'express'
 import { movieService } from '../services'
 import { IMovie } from '../interfaces/movie.interface'
+import { ApiError } from '../utils/helper'
 
 const getMovies = async (req: Request, res: Response) => {
   try {
     const doc = await movieService.getMultiple()
-    return doc
-  } catch (error) {
-    console.log(`Error while getting movies `, error)
+    return res.json(doc)
+  } catch (error: ErrorConstructor | any) {
+    return res.json(ApiError(true, 500, error.message))
   }
 }
 
@@ -15,9 +16,9 @@ const createMovie = async (req: Request, res: Response) => {
   try {
     const payload = req?.body as IMovie
     const doc = await movieService.create(payload)
-    return doc
-  } catch (error) {
-    console.log(`Error while create movie `, error)
+    return res.json(doc)
+  } catch (error: ErrorConstructor | any) {
+    return res.json(ApiError(true, 500, error.message))
   }
 }
 
