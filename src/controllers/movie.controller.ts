@@ -27,9 +27,9 @@ const updateMovie = async (req: Request, res: Response) => {
     const id = req.params.id
     const payload = req?.body as IMovie
     const doc = await movieService.update(id, payload)
-    return doc
-  } catch (error) {
-    console.log(`Error while update movie `, error)
+    return res.json(doc)
+  } catch (error: ErrorConstructor | any) {
+    return res.json(ApiError(true, 500, error.message))
   }
 }
 
@@ -37,9 +37,9 @@ const deleteMovie = async (req: Request, res: Response) => {
   try {
     const id = req.params.id
     const doc = await movieService.remove(id)
-    return doc
-  } catch (error) {
-    console.log(`Error while delete movie `, error)
+    return res.json(doc)
+  } catch (error: ErrorConstructor | any) {
+    return res.json(ApiError(true, 500, error.message))
   }
 }
 

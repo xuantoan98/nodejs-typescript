@@ -1,16 +1,8 @@
-import { envConfig } from '../config/envConfig'
-import mysql, { Connection } from 'mysql'
+import { DB } from '../config/envConfig'
+import mysql, { Connection } from 'mysql2'
 
 export const query = async (sql: string, params?: any) => {
-  const config = {
-    host: envConfig.host,
-    user: envConfig.user,
-    password: envConfig.password,
-    database: envConfig.database,
-    connectTimeout: envConfig.connectTimeout
-  } as mysql.ConnectionOptions
-
-  const connection: Connection = mysql.createConnection(config)
+  const connection: Connection = mysql.createConnection(DB)
 
   const results = connection.query(sql, params)
 

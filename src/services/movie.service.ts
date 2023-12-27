@@ -2,13 +2,13 @@ import { DB, envConfig } from '~/config/envConfig'
 import { IMovie } from '../interfaces/movie.interface'
 import { getOffset, formatResponse } from '../utils/helper'
 import mysql, { ConnectionOptions } from 'mysql2/promise'
-import { v4 as uuidv4 } from 'uuid'
+import { v4 as uuid4 } from 'uuid'
 
 const getMultiple = async (page = 1) => {
   const connection = await mysql.createConnection(DB as ConnectionOptions)
   const offset = getOffset(page, 10)
   const meta = { page }
-  const queryStr = `SELECT id, name, released_year, githut_rank, pypl_rank, tiobe_rank FROM programming_languages LIMIT ${offset}, ${envConfig.listPerPage}`
+  const queryStr = `SELECT id, title, image_thumbnail, auth_name, publish_date FROM movie LIMIT ${offset}, ${envConfig.listPerPage}`
   const [rows] = await connection.query(queryStr)
   connection.end()
 
@@ -32,7 +32,7 @@ const create = async (movie: IMovie) => {
     throw new Error('TITLE AND AUTH_NAME IS REQUIRE')
   }
   const connection = await mysql.createConnection(DB as ConnectionOptions)
-  const _id = uuidv4().toString()
+  const _id = uuid4().toString()
   const queryStr = `INSERT INTO movie 
   (id, title, image_thumbnail, auth_name, publish_date) 
   VALUES 
@@ -45,11 +45,38 @@ const create = async (movie: IMovie) => {
 
   connection.end()
 
-  return formatResponse(200, false, 'CREATE_MOVIE_SUCCESSFULLY', data)
+  return formatResponse(201, false, 'CREATE_MOVIE_SUCCESSFULLY', data)
 }
 
-const update = async (id: string, data: IMovie) => {}
+const update = async (id: string, data: IMovie) => {
+  const connection = await mysql.createConnection(DB as ConnectionOptions)
+  const movie = await getMovieById(id, true)
+  if(!movie) {
+    throw new Error('MOVIE_NOT_FOUND')
+  }
 
-const remove = async (id: string) => {}
+  const queryStrUpdate = `UPDATE movie SET title='${data.title}', image_thumbnail='${data.imageThumbnail}', auth_name='${data.authName}', publish_date='${data.publishDate}' WHERE id='${id}'`
+  const [rows] = await connection.query(queryStrUpdate)
+  if (!rows) throw new Error('INTERNAL_SERVER_ERROR')
+  const result = await getMovieById(id, true)
+
+  connection.end()
+  return formatResponse(200, false, 'UPDATE_MOVIE_SUCCESSFULLY', result)
+}
+
+const remove = async (id: string) => {
+  const connection = await mysql.createConnection(DB as ConnectionOptions)
+  const movie = await getMovieById(id, true)
+  if(!movie) {
+    throw new Error('MOVIE_NOT_FOUND')
+  }
+
+  const queryDelete = `DELETE FROM movie WHERE id='${id}'`
+  const [rows] = await connection.query(queryDelete)
+  if (!rows) throw new Error('INTERNAL_SERVER_ERROR')
+
+  connection.end()
+  return formatResponse(200, false, 'DELETE_MOVIE_SUCCESSFULLY', {})
+}
 
 export { getMultiple, create, update, remove, getMovieById }
