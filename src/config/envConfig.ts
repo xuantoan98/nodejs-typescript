@@ -15,3 +15,11 @@ export const DB = {
   database: 'db_node_api',
   connectTimeout: 60
 }
+
+export enum SessionTypesEnum {
+  ACCESS = 'access',
+  REFRESH = 'refresh',
+  RESET_PASSWORD = 'resetPassword'
+}
+
+export type SessionTypes = SessionTypesEnum.ACCESS | SessionTypesEnum.REFRESH | SessionTypesEnum.RESET_PASSWORD

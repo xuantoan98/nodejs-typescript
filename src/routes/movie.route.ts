@@ -1,5 +1,6 @@
 import express from 'express'
 import { movieController } from '../controllers'
+import { authenticateToken } from '~/services/session.service'
 
 const router = express.Router()
 
@@ -7,7 +8,7 @@ const router = express.Router()
 router.get('/', movieController.getMovies)
 
 // POST Movie
-router.post('/', movieController.createMovie)
+router.post('/', authenticateToken, movieController.createMovie)
 
 // PUT Movie
 router.put('/:id', movieController.updateMovie)
